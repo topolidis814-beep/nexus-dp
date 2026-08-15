@@ -25,6 +25,7 @@ const server = http.createServer(async (req,res)=>{
   if (!hit(req)) return send(res,429,{error:'Troppe richieste'});
   const url = new URL(req.url, `http://${req.headers.host}`);
   const db = load();
+  if (url.pathname === '/') return send(res, 200, 'Nexus DP online');
   try {
     if (url.pathname === '/api/health') return send(res,200,{ok:true,name:'Nexus V1'});
     if (url.pathname === '/api/session' && req.method==='GET') return send(res,200,{user:sanitizeUser(userFrom(req,db))});
