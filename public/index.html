@@ -1,97 +1,279 @@
 <!doctype html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="NEXUS - Marketplace B2B per stock, eccedenze e rimanenze aziendali.">
-  <title>NEXUS | Marketplace B2B</title>
-  <style>
-    :root{--bg:#07111f;--panel:#0d1b2a;--panel2:#12243a;--text:#f4f7fb;--muted:#9fb0c5;--accent:#34d399;--accent2:#38bdf8;--line:#20364f;--danger:#fb7185}
-    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#07111f,#091827);color:var(--text)}
-    a{text-decoration:none;color:inherit}.wrap{max-width:1180px;margin:auto;padding:0 20px}
-    header{position:sticky;top:0;z-index:10;background:rgba(7,17,31,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-    nav{height:70px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{font-size:24px;font-weight:900;letter-spacing:2px}.brand span{color:var(--accent)}
-    .navlinks{display:flex;gap:22px;color:var(--muted);font-weight:600}.actions{display:flex;gap:10px}.btn{border:1px solid var(--line);background:var(--panel);color:white;padding:11px 16px;border-radius:10px;font-weight:800;cursor:pointer}.btn.primary{background:var(--accent);color:#052015;border-color:var(--accent)}
-    .hero{padding:80px 0 55px;display:grid;grid-template-columns:1.2fr .8fr;gap:42px;align-items:center}.eyebrow{color:var(--accent);font-weight:900;text-transform:uppercase;letter-spacing:1.4px;font-size:13px}
-    h1{font-size:clamp(42px,6vw,72px);line-height:.98;margin:14px 0 20px;letter-spacing:-2px}.lead{font-size:19px;line-height:1.6;color:var(--muted);max-width:700px}.hero-buttons{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
-    .card{background:linear-gradient(145deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.22)}
-    .metric{display:flex;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--line)}.metric:last-child{border:0}.metric b{color:var(--accent)}
-    section{padding:48px 0}.section-title{font-size:32px;margin:0 0 10px}.section-sub{color:var(--muted);margin:0 0 26px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    .feature h3{margin:10px 0 8px}.feature p{color:var(--muted);line-height:1.5;margin:0}.icon{font-size:27px}
-    .market{display:grid;grid-template-columns:1fr 1fr;gap:18px}.searchbox{display:flex;gap:10px;margin:18px 0}.searchbox input{flex:1;background:#07111f;border:1px solid var(--line);border-radius:10px;padding:14px;color:white;font-size:16px}
-    .chips{display:flex;gap:8px;flex-wrap:wrap}.chip{background:#102238;border:1px solid var(--line);padding:8px 11px;border-radius:999px;color:#c8d5e4;font-size:13px}
-    .listing{display:flex;justify-content:space-between;gap:15px;align-items:center;padding:15px 0;border-bottom:1px solid var(--line)}.listing:last-child{border:0}.price{font-size:20px;font-weight:900;color:var(--accent)}
-    .cta{text-align:center;padding:50px 24px}.cta h2{font-size:36px;margin:0 0 12px}.cta p{color:var(--muted);max-width:650px;margin:0 auto 22px}
-    footer{border-top:1px solid var(--line);color:var(--muted);padding:30px 0;margin-top:30px}
-    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:20;align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}.modal .card{width:min(520px,100%)}.modal input,.modal textarea,.modal select{width:100%;margin:7px 0 12px;padding:13px;border-radius:9px;border:1px solid var(--line);background:#07111f;color:white}.close{float:right;cursor:pointer;color:var(--muted)}
-    @media(max-width:800px){.navlinks{display:none}.hero,.market,.grid{grid-template-columns:1fr}.hero{padding-top:50px}h1{font-size:46px}.actions .login{display:none}}
-  </style>
-</head>
-<body>
-<header><div class="wrap"><nav>
-  <a class="brand" href="#">NEXUS<span>•</span></a>
-  <div class="navlinks"><a href="#come">Come funziona</a><a href="#market">Marketplace</a><a href="#aziende">Per aziende</a></div>
-  <div class="actions"><button class="btn login" onclick="openModal('accesso')">Accedi</button><button class="btn primary" onclick="openModal('pubblica')">Pubblica merce</button></div>
-</nav></div></header>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="NEXUS - Marketplace B2B per stock, eccedenze e rimanenze aziendali.">
+<title>NEXUS | Marketplace B2B</title>
 
-<main>
-<div class="wrap hero">
-  <div>
-    <div class="eyebrow">Marketplace B2B italiano</div>
-    <h1>Trasforma lo stock fermo in liquidità.</h1>
-    <p class="lead">NEXUS mette in contatto aziende che hanno eccedenze, rimanenze, fine serie e attrezzature inutilizzate con aziende che cercano opportunità d'acquisto.</p>
-    <div class="hero-buttons"><button class="btn primary" onclick="document.querySelector('#market').scrollIntoView({behavior:'smooth'})">Trova merce</button><button class="btn" onclick="openModal('pubblica')">Vendi il tuo stock</button></div>
+<style>
+:root{
+  --bg:#07111f;--panel:#0d1b2a;--panel2:#12243a;
+  --text:#f4f7fb;--muted:#9fb0c5;--accent:#34d399;
+  --line:#20364f;--danger:#fb7185
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:#07111f;color:var(--text)
+}
+.wrap{max-width:1100px;margin:auto;padding:20px}
+header{border-bottom:1px solid var(--line);background:#07111f}
+nav{min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.brand{font-size:25px;font-weight:900;letter-spacing:2px}
+.brand span{color:var(--accent)}
+.row{display:flex;gap:9px;flex-wrap:wrap}
+.card{
+  background:linear-gradient(145deg,var(--panel),var(--panel2));
+  border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0
+}
+button,input,textarea,select{
+  padding:12px;border-radius:9px;border:1px solid var(--line);
+  background:#07111f;color:white;font:inherit
+}
+button{background:var(--accent);color:#052015;font-weight:800;cursor:pointer}
+button.secondary{background:#12243a;color:white}
+input{min-width:180px}
+textarea{width:100%;min-height:100px}
+.muted{color:var(--muted)}
+.ok{color:var(--accent)}
+.bad{color:var(--danger)}
+.price{color:var(--accent);font-size:20px;font-weight:900}
+.hero{padding:45px 0 20px}
+h1{font-size:clamp(42px,7vw,68px);line-height:1;margin:10px 0}
+.tabs{margin:20px 0}
+.listing{border-bottom:1px solid var(--line);padding:15px 0}
+.modal{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);
+  z-index:20;align-items:center;justify-content:center;padding:20px
+}
+.modal.open{display:flex}
+.modal>.card{width:min(600px,100%);max-height:90vh;overflow:auto}
+.close{float:right;cursor:pointer;color:var(--muted);font-size:22px}
+@media(max-width:700px){
+  nav{align-items:flex-start;padding:14px 0;flex-direction:column}
+  input{width:100%}
+  .row button{flex-grow:1}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="wrap">
+<nav>
+  <div class="brand">NEXUS<span>•</span></div>
+  <div class="row">
+    <button class="secondary" onclick="openModal('accesso')">Accedi</button>
+    <button onclick="publishForm()">Pubblica merce</button>
   </div>
-  <div class="card">
-    <div class="eyebrow">NEXUS in sintesi</div>
-    <div class="metric"><span>Pubblicazione</span><b>Rapida</b></div>
-    <div class="metric"><span>Target</span><b>Aziende B2B</b></div>
-    <div class="metric"><span>Merce</span><b>Stock & eccedenze</b></div>
-    <div class="metric"><span>Obiettivo</span><b>Generare richieste</b></div>
+</nav>
+</div>
+</header>
+
+<main class="wrap">
+
+<section class="hero">
+  <div class="muted">MARKETPLACE B2B ITALIANO</div>
+  <h1>Trasforma lo stock fermo in liquidità.</h1>
+  <p class="muted">
+    NEXUS mette in contatto aziende con eccedenze, rimanenze,
+    fine serie e attrezzature con aziende alla ricerca di opportunità.
+  </p>
+</section>
+
+<section class="card">
+  <b>Account NEXUS</b>
+  <p id="authStatus" class="muted">Controllo sessione...</p>
+
+  <div class="row">
+    <button class="secondary" onclick="openModal('accesso')">Accedi / Registrati</button>
+    <button onclick="publishForm()">Pubblica merce</button>
   </div>
+</section>
+
+<div class="row tabs">
+  <button onclick="market()">Marketplace</button>
+  <button class="secondary" onclick="myListings()">I miei annunci</button>
+  <button class="secondary" onclick="offers()">Offerte</button>
+  <button class="secondary" onclick="transactions()">Transazioni</button>
 </div>
 
-<section id="come"><div class="wrap">
-  <h2 class="section-title">Come funziona</h2><p class="section-sub">Tre passaggi per rimettere in circolo valore aziendale.</p>
-  <div class="grid">
-    <div class="card feature"><div class="icon">📦</div><h3>1. Pubblica</h3><p>Inserisci lotto, quantità, condizioni, prezzo e località.</p></div>
-    <div class="card feature"><div class="icon">🔎</div><h3>2. Fatti trovare</h3><p>Le aziende interessate cercano per categoria e opportunità.</p></div>
-    <div class="card feature"><div class="icon">🤝</div><h3>3. Ricevi richieste</h3><p>Buyer e seller entrano in contatto per negoziare e concludere.</p></div>
-  </div>
-</div></section>
+<p id="msg" class="muted"></p>
+<div id="out"></div>
 
-<section id="market"><div class="wrap market">
-  <div class="card">
-    <div class="eyebrow">Cerca opportunità</div><h2>Marketplace</h2>
-    <div class="searchbox"><input id="q" placeholder="Cerca stock, materiali, attrezzature..."><button class="btn primary" onclick="search()">Cerca</button></div>
-    <div class="chips"><span class="chip">Fine serie</span><span class="chip">Elettronica</span><span class="chip">Attrezzature</span><span class="chip">Materiali</span><span class="chip">Macchinari</span><span class="chip">Lotti</span></div>
-    <p id="searchResult" style="color:var(--muted);margin-top:18px">Inserisci una ricerca per esplorare le offerte.</p>
-  </div>
-  <div class="card">
-    <div class="eyebrow">Esempi di inserzioni</div>
-    <div class="listing"><div><b>Lotto componenti industriali</b><div style="color:var(--muted)">Lombardia · 250 pz</div></div><div class="price">€ 2.400</div></div>
-    <div class="listing"><div><b>Notebook aziendali</b><div style="color:var(--muted)">Nord Italia · 20 pz</div></div><div class="price">€ 3.900</div></div>
-    <div class="listing"><div><b>Scaffalatura professionale</b><div style="color:var(--muted)">Brescia · Lotto</div></div><div class="price">€ 1.250</div></div>
-  </div>
-</div></section>
-
-<section id="aziende"><div class="wrap">
-  <div class="card cta"><div class="eyebrow">Per aziende</div><h2>Hai merce ferma in magazzino?</h2><p>Pubblicala su NEXUS e trasformala in un'opportunità commerciale visibile ad altri operatori B2B.</p><button class="btn primary" onclick="openModal('pubblica')">Crea inserzione</button></div>
-</div></section>
 </main>
 
-<footer><div class="wrap">© 2026 NEXUS · Marketplace B2B · MVP</div></footer>
 
-<div class="modal" id="accesso"><div class="card"><span class="close" onclick="closeModal('accesso')">✕</span><h2>Accesso azienda</h2><label>Email</label><input type="email" placeholder="azienda@esempio.it"><label>Password</label><input type="password" placeholder="••••••••"><button class="btn primary" onclick="demo('Accesso')">Accedi</button><p style="color:var(--muted)">Interfaccia MVP: collegamento account in fase di integrazione.</p></div></div>
+<!-- ACCESSO -->
+<div class="modal" id="accesso">
+<div class="card">
 
-<div class="modal" id="pubblica"><div class="card"><span class="close" onclick="closeModal('pubblica')">✕</span><h2>Pubblica merce</h2><input placeholder="Titolo del lotto"><select><option>Stock / rimanenze</option><option>Attrezzature</option><option>Macchinari</option><option>Elettronica</option><option>Materiali</option></select><input type="number" placeholder="Prezzo €"><input placeholder="Località"><textarea rows="4" placeholder="Descrizione"></textarea><button class="btn primary" onclick="demo('Inserzione')">Continua</button><p style="color:var(--muted)">Modulo dimostrativo MVP: il salvataggio definitivo sarà collegato al backend NEXUS.</p></div></div>
+<span class="close" onclick="closeModal('accesso')">✕</span>
 
-<script>
-function openModal(id){document.getElementById(id).classList.add('open')}
-function closeModal(id){document.getElementById(id).classList.remove('open')}
-function search(){const q=document.getElementById('q').value.trim();document.getElementById('searchResult').textContent=q?'Ricerca pronta per: “'+q+'”. Il prossimo collegamento attiverà i dati reali del marketplace.':'Scrivi cosa stai cercando.'}
-function demo(x){alert(x+' pronta nell’interfaccia. Prossimo step: collegamento al backend.')}
-document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}))
-</script>
-</body>
-</html>
+<h2>Account NEXUS</h2>
+
+<label>Email</label>
+<input id="email" type="email" placeholder="azienda@esempio.it">
+
+<label>Password</label>
+<input id="password" type="password" placeholder="Minimo 6 caratteri">
+
+<div class="row">
+  <button onclick="signup()">Registrati</button>
+  <button class="secondary" onclick="login()">Accedi</button>
+  <button class="secondary" onclick="logout()">Esci</button>
+</div>
+
+<p id="authMessage" class="muted"></p>
+
+</div>
+</div>
+
+
+<!-- PUBBLICAZIONE -->
+<div class="modal" id="pubblica">
+<div class="card">
+
+<span class="close" onclick="closeModal('pubblica')">✕</span>
+
+<h2>Pubblica merce</h2>
+
+<label>Nome ditta</label>
+<input id="companyName" placeholder="Nome azienda">
+
+<label>Partita IVA / identificativo fiscale</label>
+<input id="vat" placeholder="Partita IVA">
+
+<label>Titolo</label>
+<input id="title" placeholder="Titolo del lotto">
+
+<label>Categoria</label>
+<input id="category" placeholder="Stock / rimanenze">
+
+<label>Quantità</label>
+<input id="quantity" type="number" min="0.01" step="0.01" placeholder="Quantità">
+
+<label>Unità</label>
+<input id="unit" placeholder="pz, kg, pallet...">
+
+<label>Prezzo unitario €</label>
+<input id="price" type="number" min="0" step="0.01" placeholder="100">
+
+<label>Località</label>
+<input id="location" placeholder="Milano">
+
+<label>Descrizione</label>
+<textarea id="description" placeholder="Descrizione della merce"></textarea>
+
+<button onclick="publishListing()">Pubblica nel marketplace</button>
+
+<p id="publishMessage" class="muted"></p>
+
+</div>
+</div>
+
+
+<script type="module">
+
+import { createClient } from
+'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const supabase = createClient(
+  'https://dneascaddmtauntlimpi.supabase.co',
+  'sb_publishable_4vVAwKpUYS3y3__Z4I7HgA_qnL-TEZn'
+);
+
+const $ = id => document.getElementById(id);
+
+function escapeHtml(value){
+  return String(value ?? '').replace(/[&<>"']/g,c=>({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[c]));
+}
+
+window.openModal = function(id){
+  $(id).classList.add('open');
+};
+
+window.closeModal = function(id){
+  $(id).classList.remove('open');
+};
+
+async function currentUser(){
+  const {data} = await supabase.auth.getUser();
+  return data.user || null;
+}
+
+async function refreshAuth(){
+
+  const user = await currentUser();
+
+  $('authStatus').textContent =
+    user ? 'Connesso: ' + user.email : 'Non autenticato';
+
+  return user;
+}
+
+
+/* =========================
+   REGISTRAZIONE
+========================= */
+
+window.signup = async function(){
+
+  const email = $('email').value.trim();
+  const password = $('password').value;
+
+  if(!email || password.length < 6){
+    $('authMessage').textContent =
+      'Inserisci email e password di almeno 6 caratteri.';
+    return;
+  }
+
+  const {data,error} = await supabase.auth.signUp({
+    email,
+    password,
+    options:{
+      emailRedirectTo:location.origin
+    }
+  });
+
+  if(error){
+    $('authMessage').textContent = 'Errore: ' + error.message;
+    return;
+  }
+
+  if(data.session){
+    $('authMessage').textContent = 'Registrazione completata.';
+  }else{
+    $('authMessage').textContent =
+      'Registrazione effettuata. Se richiesto, conferma l’email e poi accedi.';
+  }
+
+  await refreshAuth();
+};
+
+
+/* =========================
+   LOGIN
+========================= */
+
+window.login = async function(){
+
+  const {error} = await supabase.auth.signInWithPassword({
+    email:$('email').value.trim(),
+    password:$('password').value
+  });
+
+  if(error){
+    $('authMessage').textContent = 'Errore: ' + error.message;
+    return;
+  }
+
+  $('authMessage').textContent =
