@@ -14,8 +14,10 @@
 }
 *{box-sizing:border-box}
 body{
-  margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  background:#07111f;color:var(--text)
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:#07111f;
+  color:var(--text)
 }
 .wrap{max-width:1100px;margin:auto;padding:20px}
 header{border-bottom:1px solid var(--line);background:#07111f}
@@ -25,13 +27,25 @@ nav{min-height:70px;display:flex;align-items:center;justify-content:space-betwee
 .row{display:flex;gap:9px;flex-wrap:wrap}
 .card{
   background:linear-gradient(145deg,var(--panel),var(--panel2));
-  border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:18px;
+  margin:14px 0
 }
 button,input,textarea,select{
-  padding:12px;border-radius:9px;border:1px solid var(--line);
-  background:#07111f;color:white;font:inherit
+  padding:12px;
+  border-radius:9px;
+  border:1px solid var(--line);
+  background:#07111f;
+  color:white;
+  font:inherit
 }
-button{background:var(--accent);color:#052015;font-weight:800;cursor:pointer}
+button{
+  background:var(--accent);
+  color:#052015;
+  font-weight:800;
+  cursor:pointer
+}
 button.secondary{background:#12243a;color:white}
 input{min-width:180px}
 textarea{width:100%;min-height:100px}
@@ -42,10 +56,15 @@ textarea{width:100%;min-height:100px}
 .hero{padding:45px 0 20px}
 h1{font-size:clamp(42px,7vw,68px);line-height:1;margin:10px 0}
 .tabs{margin:20px 0}
-.listing{border-bottom:1px solid var(--line);padding:15px 0}
 .modal{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);
-  z-index:20;align-items:center;justify-content:center;padding:20px
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  z-index:20;
+  align-items:center;
+  justify-content:center;
+  padding:20px
 }
 .modal.open{display:flex}
 .modal>.card{width:min(600px,100%);max-height:90vh;overflow:auto}
@@ -65,8 +84,8 @@ h1{font-size:clamp(42px,7vw,68px);line-height:1;margin:10px 0}
 <nav>
   <div class="brand">NEXUS<span>•</span></div>
   <div class="row">
-    <button class="secondary" onclick="openModal('accesso')">Accedi</button>
-    <button onclick="publishForm()">Pubblica merce</button>
+    <button class="secondary" id="openAccessTop">Accedi</button>
+    <button id="openPublishTop">Pubblica merce</button>
   </div>
 </nav>
 </div>
@@ -88,16 +107,16 @@ h1{font-size:clamp(42px,7vw,68px);line-height:1;margin:10px 0}
   <p id="authStatus" class="muted">Controllo sessione...</p>
 
   <div class="row">
-    <button class="secondary" onclick="openModal('accesso')">Accedi / Registrati</button>
-    <button onclick="publishForm()">Pubblica merce</button>
+    <button class="secondary" id="openAccess">Accedi / Registrati</button>
+    <button id="openPublish">Pubblica merce</button>
   </div>
 </section>
 
 <div class="row tabs">
-  <button onclick="market()">Marketplace</button>
-  <button class="secondary" onclick="myListings()">I miei annunci</button>
-  <button class="secondary" onclick="offers()">Offerte</button>
-  <button class="secondary" onclick="transactions()">Transazioni</button>
+  <button id="btnMarket">Marketplace</button>
+  <button class="secondary" id="btnMine">I miei annunci</button>
+  <button class="secondary" id="btnOffers">Offerte</button>
+  <button class="secondary" id="btnTx">Transazioni</button>
 </div>
 
 <p id="msg" class="muted"></p>
@@ -105,12 +124,10 @@ h1{font-size:clamp(42px,7vw,68px);line-height:1;margin:10px 0}
 
 </main>
 
-
-<!-- ACCESSO -->
 <div class="modal" id="accesso">
 <div class="card">
 
-<span class="close" onclick="closeModal('accesso')">✕</span>
+<span class="close" id="closeAccess">✕</span>
 
 <h2>Account NEXUS</h2>
 
@@ -121,9 +138,9 @@ h1{font-size:clamp(42px,7vw,68px);line-height:1;margin:10px 0}
 <input id="password" type="password" placeholder="Minimo 6 caratteri">
 
 <div class="row">
-  <button onclick="signup()">Registrati</button>
-  <button class="secondary" onclick="login()">Accedi</button>
-  <button class="secondary" onclick="logout()">Esci</button>
+  <button id="btnSignup">Registrati</button>
+  <button class="secondary" id="btnLogin">Accedi</button>
+  <button class="secondary" id="btnLogout">Esci</button>
 </div>
 
 <p id="authMessage" class="muted"></p>
@@ -131,12 +148,10 @@ h1{font-size:clamp(42px,7vw,68px);line-height:1;margin:10px 0}
 </div>
 </div>
 
-
-<!-- PUBBLICAZIONE -->
 <div class="modal" id="pubblica">
 <div class="card">
 
-<span class="close" onclick="closeModal('pubblica')">✕</span>
+<span class="close" id="closePublish">✕</span>
 
 <h2>Pubblica merce</h2>
 
@@ -167,18 +182,16 @@ h1{font-size:clamp(42px,7vw,68px);line-height:1;margin:10px 0}
 <label>Descrizione</label>
 <textarea id="description" placeholder="Descrizione della merce"></textarea>
 
-<button onclick="publishListing()">Pubblica nel marketplace</button>
+<button id="btnPublish">Pubblica nel marketplace</button>
 
 <p id="publishMessage" class="muted"></p>
 
 </div>
 </div>
 
-
 <script type="module">
 
-import { createClient } from
-'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
 const supabase = createClient(
   'https://dneascaddmtauntlimpi.supabase.co',
@@ -197,21 +210,21 @@ function escapeHtml(value){
   }[c]));
 }
 
-window.openModal = function(id){
+function openModal(id){
   $(id).classList.add('open');
-};
+}
 
-window.closeModal = function(id){
+function closeModal(id){
   $(id).classList.remove('open');
-};
+}
 
 async function currentUser(){
-  const {data} = await supabase.auth.getUser();
+  const {data,error} = await supabase.auth.getUser();
+  if(error) return null;
   return data.user || null;
 }
 
 async function refreshAuth(){
-
   const user = await currentUser();
 
   $('authStatus').textContent =
@@ -220,12 +233,7 @@ async function refreshAuth(){
   return user;
 }
 
-
-/* =========================
-   REGISTRAZIONE
-========================= */
-
-window.signup = async function(){
+async function signup(){
 
   const email = $('email').value.trim();
   const password = $('password').value;
@@ -249,22 +257,15 @@ window.signup = async function(){
     return;
   }
 
-  if(data.session){
-    $('authMessage').textContent = 'Registrazione completata.';
-  }else{
-    $('authMessage').textContent =
-      'Registrazione effettuata. Se richiesto, conferma l’email e poi accedi.';
-  }
+  $('authMessage').textContent =
+    data.session
+    ? 'Registrazione completata.'
+    : 'Registrazione effettuata. Se richiesto, conferma l’email e poi accedi.';
 
   await refreshAuth();
-};
+}
 
-
-/* =========================
-   LOGIN
-========================= */
-
-window.login = async function(){
+async function login(){
 
   const {error} = await supabase.auth.signInWithPassword({
     email:$('email').value.trim(),
@@ -276,4 +277,315 @@ window.login = async function(){
     return;
   }
 
-  $('authMessage').textContent =
+  $('authMessage').textContent = 'Accesso riuscito.';
+  closeModal('accesso');
+
+  await refreshAuth();
+}
+
+async function logout(){
+
+  await supabase.auth.signOut();
+
+  $('authMessage').textContent = 'Disconnesso.';
+  await refreshAuth();
+}
+
+async function ensureCompany(){
+
+  const user = await currentUser();
+
+  if(!user){
+    openModal('accesso');
+    alert('Prima registrati o accedi.');
+    return null;
+  }
+
+  const {data:companyId,error:companyError} =
+    await supabase.rpc('my_company_id');
+
+  if(companyError){
+    alert('Errore azienda: ' + companyError.message);
+    return null;
+  }
+
+  if(companyId){
+    return companyId;
+  }
+
+  const name = $('companyName').value.trim();
+  const vat = $('vat').value.trim();
+
+  if(!name || !vat){
+    alert('Inserisci Nome ditta e Partita IVA.');
+    return null;
+  }
+
+  const {data,error} =
+    await supabase.rpc('create_company_and_join',{
+      p_name:name,
+      p_vat:vat,
+      p_sector:null,
+      p_city:$('location').value.trim() || null,
+      p_province:null,
+      p_ships:false
+    });
+
+  if(error){
+    alert('Errore creazione azienda: ' + error.message);
+    return null;
+  }
+
+  alert('Azienda creata e collegata al tuo account.');
+
+  return data?.id || data;
+}
+
+async function publishForm(){
+
+  const user = await currentUser();
+
+  if(!user){
+    openModal('accesso');
+    return;
+  }
+
+  openModal('pubblica');
+}
+
+async function publishListing(){
+
+  $('publishMessage').textContent = 'Pubblicazione in corso...';
+
+  const company = await ensureCompany();
+
+  if(!company){
+    $('publishMessage').textContent =
+      'Impossibile completare la configurazione azienda.';
+    return;
+  }
+
+  const title = $('title').value.trim();
+  const quantity = Number($('quantity').value);
+  const unit = $('unit').value.trim();
+  const price = Number($('price').value);
+
+  if(!title || !quantity || !unit || !Number.isFinite(price)){
+    $('publishMessage').textContent =
+      'Compila titolo, quantità, unità e prezzo.';
+    return;
+  }
+
+  const {data,error} =
+    await supabase.rpc('create_listing',{
+      p_title:title,
+      p_description:$('description').value.trim() || null,
+      p_quantity:quantity,
+      p_unit:unit,
+      p_unit_price:price,
+      p_category_id:null,
+      p_category_text:$('category').value.trim() || null,
+      p_condition:null,
+      p_location:$('location').value.trim() || null,
+      p_ships:true,
+      p_min_qty:null,
+      p_full_lot_price:null,
+      p_accepts_offers:true,
+      p_liquidate_fast:false,
+      p_status:'active'
+    });
+
+  if(error){
+    $('publishMessage').textContent =
+      'ERRORE DATABASE: ' + error.message;
+    return;
+  }
+
+  $('publishMessage').textContent =
+    'PUBBLICATO REALMENTE NEL DATABASE NEXUS';
+
+  alert('Annuncio pubblicato nel database NEXUS.');
+
+  closeModal('pubblica');
+
+  await myListings();
+}
+
+async function market(){
+
+  $('msg').textContent = 'Caricamento marketplace...';
+
+  const {data,error} =
+    await supabase.rpc('marketplace_feed',{
+      p_limit:30,
+      p_offset:0
+    });
+
+  if(error){
+    $('msg').textContent =
+      'Errore marketplace: ' + error.message;
+    return;
+  }
+
+  const listings =
+    Array.isArray(data) ? data : (data?.items || []);
+
+  $('msg').textContent =
+    'Marketplace · ' + listings.length + ' annunci';
+
+  $('out').innerHTML =
+    listings.length
+    ? listings.map(x=>`
+      <div class="card">
+        <b>${escapeHtml(x.title)}</b>
+        <div class="muted">${escapeHtml(x.location || '')}</div>
+        <div class="price">
+          € ${escapeHtml(x.unit_price ?? x.price ?? '—')}
+        </div>
+      </div>
+    `).join('')
+    : '<div class="card muted">Nessun annuncio disponibile.</div>';
+}
+
+async function myListings(){
+
+  if(!await currentUser()){
+    openModal('accesso');
+    return;
+  }
+
+  const {data,error} =
+    await supabase.rpc('my_listings',{
+      p_status:null,
+      p_limit:50,
+      p_offset:0
+    });
+
+  if(error){
+    $('msg').textContent =
+      'Errore: ' + error.message;
+    return;
+  }
+
+  $('msg').textContent =
+    'I miei annunci · ' + (data || []).length;
+
+  $('out').innerHTML =
+    (data || []).map(x=>`
+      <div class="card">
+        <b>${escapeHtml(x.title)}</b>
+        <div class="muted">
+          ${escapeHtml(x.status)} · stock ${escapeHtml(x.quantity)}
+        </div>
+      </div>
+    `).join('') ||
+    '<div class="card muted">Non hai ancora annunci.</div>';
+}
+
+async function offers(){
+
+  if(!await currentUser()){
+    openModal('accesso');
+    return;
+  }
+
+  const {data,error} =
+    await supabase.rpc('offer_inbox',{
+      p_side:'all',
+      p_status:null,
+      p_limit:50,
+      p_offset:0
+    });
+
+  if(error){
+    $('msg').textContent =
+      'Errore offerte: ' + error.message;
+    return;
+  }
+
+  $('msg').textContent =
+    'Offerte · ' + (data || []).length;
+
+  $('out').innerHTML =
+    (data || []).map(x=>`
+      <div class="card">
+        <b>${escapeHtml(x.listing_title || 'Offerta')}</b>
+        <div>
+          ${escapeHtml(x.status)}
+          · ${escapeHtml(x.quantity)}
+          × € ${escapeHtml(x.price)}
+        </div>
+      </div>
+    `).join('') ||
+    '<div class="card muted">Nessuna offerta.</div>';
+}
+
+async function transactions(){
+
+  if(!await currentUser()){
+    openModal('accesso');
+    return;
+  }
+
+  const {data,error} =
+    await supabase.rpc('my_transactions',{
+      p_limit:50,
+      p_offset:0
+    });
+
+  if(error){
+    $('msg').textContent =
+      'Errore transazioni: ' + error.message;
+    return;
+  }
+
+  $('msg').textContent =
+    'Transazioni · ' + (data || []).length;
+
+  $('out').innerHTML =
+    (data || []).map(x=>`
+      <div class="card">
+        <b>${escapeHtml(x.listing_title || 'Transazione')}</b>
+        <div>
+          ${escapeHtml(x.status)}
+          · ${escapeHtml(x.quantity)}
+          × € ${escapeHtml(x.unit_price ?? x.price)}
+        </div>
+      </div>
+    `).join('') ||
+    '<div class="card muted">Nessuna transazione.</div>';
+}
+
+$('openAccessTop').addEventListener('click',()=>openModal('accesso'));
+$('openAccess').addEventListener('click',()=>openModal('accesso'));
+$('openPublishTop').addEventListener('click',publishForm);
+$('openPublish').addEventListener('click',publishForm);
+
+$('closeAccess').addEventListener('click',()=>closeModal('accesso'));
+$('closePublish').addEventListener('click',()=>closeModal('pubblica'));
+
+$('btnSignup').addEventListener('click',signup);
+$('btnLogin').addEventListener('click',login);
+$('btnLogout').addEventListener('click',logout);
+$('btnPublish').addEventListener('click',publishListing);
+
+$('btnMarket').addEventListener('click',market);
+$('btnMine').addEventListener('click',myListings);
+$('btnOffers').addEventListener('click',offers);
+$('btnTx').addEventListener('click',transactions);
+
+document.querySelectorAll('.modal').forEach(modal=>{
+  modal.addEventListener('click',e=>{
+    if(e.target===modal){
+      modal.classList.remove('open');
+    }
+  });
+});
+
+await refreshAuth();
+await market();
+
+</script>
+
+</body>
+</html>
