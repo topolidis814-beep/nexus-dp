@@ -173,7 +173,12 @@
 
 </main>
 
-<script>
+<script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  const SUPABASE_URL = 'https://dneascaddmtauntlimpi.supabase.co';
+const SUPABASE_KEY = const SUPABASE_URL = 'https://dneascaddmtauntlimpi.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_4vVAwKpUYS3y3__Z4I7HgA_qnL-TEZn';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 function showSection(id){
   ['marketplace','publish','offers','transactions']
     .forEach(x => document.getElementById(x).classList.add('hidden'));
