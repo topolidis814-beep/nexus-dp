@@ -125,6 +125,9 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const $ = id => document.getElementById(id);
 
+let selectedListing = null;
+let marketRows = [];
+
 function esc(v){
   return String(v ?? '').replace(/[&<>"']/g, c => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
@@ -191,6 +194,8 @@ $('loginBtn').onclick = async () => {
 
 $('logoutBtn').onclick = async () => {
   await db.auth.signOut();
+  selectedListing = null;
+  $('offerListingId').value = '';
   await refreshAccount();
 };
 
@@ -281,6 +286,8 @@ $('publishBtn').onclick = async () => {
 
 async function loadMarket(){
   show('marketplace');
+  selectedListing = null;
+  $('offerListingId').value = '';
   $('marketOutput').innerHTML='<p class="muted">Caricamento...</p>';
 
   const {data,error}=await db.rpc('marketplace_feed',{
@@ -294,10 +301,10 @@ async function loadMarket(){
     return;
   }
 
-  const rows=data || [];
+  marketRows=data || [];
 
   $('marketOutput').innerHTML =
-    rows.length ? rows.map(x => `
+    marketRows.length ? marketRows.map(x => `
       <div class="item">
         <h3>${esc(x.title)}</h3>
         <div class="muted">${esc(x.company_name || '')}</div>
@@ -306,9 +313,7 @@ async function loadMarket(){
         <div class="muted">${esc(x.location || '')}</div>
         <br>
         <button class="offerButton"
-          data-id="${esc(x.id)}"
-          data-title="${esc(x.title)}"
-          data-price="${esc(x.unit_price)}">
+          data-id="${esc(x.id)}">
           Fai offerta
         </button>
       </div>
@@ -322,18 +327,35 @@ async function loadMarket(){
         return;
       }
 
-      $('offerListingId').value=btn.dataset.id;
-      $('offerTitle').textContent=btn.dataset.title;
-      $('offerPrice').value=btn.dataset.price;
-      $('offerQty').value=1;
-      $('offerMessage').value='';
-      $('offerStatus').textContent='';
+      const listing = marketRows.find(x => String(x.id) === String(btn.dataset.id));
+
+      if(!listing || !listing.id){
+        alert('Errore: ID annuncio non disponibile. Ricarica il Marketplace.');
+        await loadMarket();
+        return;
+      }
+
+      selectedListing = listing;
+      $('offerListingId').value = String(listing.id);
+      $('offerTitle').textContent = listing.title || '';
+      $('offerPrice').value = listing.unit_price ?? '';
+      $('offerQty').value = 1;
+      $('offerMessage').value = '';
+      $('offerStatus').textContent = '';
       show('offerForm');
     };
   });
 }
 
 $('sendOfferBtn').onclick = async () => {
+  $('offerStatus').textContent='Verifica annuncio...';
+
+  const user = await getUser();
+  if(!user){
+    $('offerStatus').textContent='Prima devi accedere.';
+    return;
+  }
+
   const quantity=Number($('offerQty').value);
   const price=Number($('offerPrice').value);
 
@@ -342,8 +364,49 @@ $('sendOfferBtn').onclick = async () => {
     return;
   }
 
+  let listingId = selectedListing?.id || $('offerListingId').value;
+
+  if(!listingId){
+    $('offerStatus').textContent='Errore: annuncio non selezionato.';
+    return;
+  }
+
+  /*
+    FIX listing_not_found:
+    prima dell'RPC ricarichiamo il Marketplace e recuperiamo l'UUID
+    reale dell'annuncio. In questo modo non viene mai inviato un ID
+    vecchio, vuoto o non più valido.
+  */
+  const {data:freshRows,error:freshError}=await db.rpc('marketplace_feed',{
+    p_limit:100,
+    p_offset:0
+  });
+
+  if(freshError){
+    $('offerStatus').textContent='Errore verifica annuncio: '+freshError.message;
+    return;
+  }
+
+  const freshListing=(freshRows || []).find(x =>
+    String(x.id) === String(listingId)
+  );
+
+  if(!freshListing){
+    $('offerStatus').textContent=
+      'Errore: annuncio non più disponibile. Torna al Marketplace e riprova.';
+    selectedListing=null;
+    $('offerListingId').value='';
+    return;
+  }
+
+  listingId=String(freshListing.id);
+  selectedListing=freshListing;
+  $('offerListingId').value=listingId;
+
+  $('offerStatus').textContent='Invio offerta...';
+
   const {error}=await db.rpc('create_offer',{
-    p_listing_id:$('offerListingId').value,
+    p_listing_id:listingId,
     p_quantity:quantity,
     p_price:price,
     p_message:$('offerMessage').value.trim() || null
@@ -355,6 +418,8 @@ $('sendOfferBtn').onclick = async () => {
   }
 
   $('offerStatus').textContent='Offerta inviata.';
+  selectedListing=null;
+  $('offerListingId').value='';
   await loadOffers();
 };
 
