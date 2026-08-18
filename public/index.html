@@ -1,93 +1,532 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NEXUS | Marketplace B2B</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#07111f;
-  color:#f5f7fa;
-}
-
-main{
-  max-width:900px;
-  margin:auto;
-  padding:32px 20px 70px;
-}
-
-h1{
-  font-size:48px;
-  margin:20px 0 12px;
-}
-
+body{margin:0;background:#07111f;color:#f5f7fa;font-family:Arial,sans-serif}
+main{max-width:950px;margin:auto;padding:30px 18px 80px}
+h1{font-size:clamp(38px,7vw,64px);margin:15px 0}
 h2{margin-top:0}
-
-.muted{color:#9caabd}
-.hero{margin-bottom:30px}
-
-.card{
-  background:#102238;
-  border:1px solid #24415e;
-  border-radius:22px;
-  padding:24px;
-  margin:18px 0;
-}
-
-button{
-  border:0;
-  border-radius:14px;
-  padding:15px 20px;
-  font-size:17px;
-  font-weight:700;
-  cursor:pointer;
-  margin:5px 4px 5px 0;
-}
-
-.primary{
-  background:#39d5a5;
-  color:#052116;
-}
-
-.secondary{
-  background:#152b44;
-  color:white;
-  border:1px solid #294866;
-}
-
-input,textarea{
-  width:100%;
-  padding:14px;
-  margin:6px 0 14px;
-  border-radius:12px;
-  border:1px solid #304b67;
-  background:#071523;
-  color:white;
-  font-size:16px;
-}
-
-textarea{min-height:100px}
-
-label{
-  display:block;
-  color:#cbd5e1;
-}
-
-.nav{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin:20px 0;
-}
-
+.muted{color:#9fb0c5}
+.card{background:#102238;border:1px solid #24415e;border-radius:18px;padding:20px;margin:15px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+button{border:0;border-radius:12px;padding:13px 17px;font-size:16px;font-weight:700;cursor:pointer;background:#39d5a5;color:#052116}
+button.secondary{background:#172d46;color:white;border:1px solid #294866}
+button.danger{background:#642536;color:white}
+input,textarea{display:block;width:100%;padding:13px;margin:6px 0 13px;border-radius:10px;border:1px solid #304b67;background:#071523;color:white;font-size:16px}
+textarea{min-height:90px}
 .hidden{display:none}
+.price{color:#39d5a5;font-size:21px;font-weight:bold}
+.status{margin-top:12px;color:#39d5a5}
+.error{color:#fb7185}
+.item{background:#0a192a;border:1px solid #203a55;border-radius:14px;padding:16px;margin:12px 0}
+@media(max-width:600px){button{width:100%}}
+</style>
+</head>
 
-.listing{
-  padding:16px
+<body>
+<main>
+
+<div class="muted">NEXUS · MARKETPLACE PROFESSIONALE B2B</div>
+<h1>Stock fermo in liquidità.</h1>
+<p class="muted">Eccedenze, rimanenze, fine serie, materiali e attrezzature tra aziende.</p>
+
+<section class="card">
+<h2>Account NEXUS</h2>
+<input id="email" type="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<div class="row">
+<button class="secondary" id="registerBtn">Registrati</button>
+<button class="secondary" id="loginBtn">Accedi</button>
+<button class="secondary" id="logoutBtn">Esci</button>
+</div>
+<div id="accountStatus" class="status">Controllo sessione...</div>
+</section>
+
+<div class="row">
+<button id="marketBtn">Marketplace</button>
+<button class="secondary" id="publishTabBtn">Pubblica merce</button>
+<button class="secondary" id="mineBtn">I miei annunci</button>
+<button class="secondary" id="offersBtn">Offerte</button>
+<button class="secondary" id="transactionsBtn">Transazioni</button>
+</div>
+
+<section id="marketplace" class="card">
+<h2>Marketplace</h2>
+<div id="marketOutput"></div>
+</section>
+
+<section id="publish" class="card hidden">
+<h2>Pubblica merce</h2>
+
+<input id="companyName" placeholder="Nome ditta">
+<input id="vat" placeholder="Partita IVA">
+<input id="sector" placeholder="Settore">
+<input id="city" placeholder="Città">
+<input id="province" placeholder="Provincia">
+
+<hr>
+
+<input id="title" placeholder="Titolo annuncio">
+<input id="category" placeholder="Categoria">
+<input id="quantity" type="number" step="0.01" placeholder="Quantità">
+<input id="unit" placeholder="Unità: pz, kg, pallet...">
+<input id="price" type="number" step="0.01" placeholder="Prezzo unitario €">
+<input id="minQty" type="number" step="0.01" value="1" placeholder="Quantità minima">
+<input id="fullLotPrice" type="number" step="0.01" placeholder="Prezzo lotto completo (opzionale)">
+<input id="location" placeholder="Località">
+<textarea id="description" placeholder="Descrizione"></textarea>
+
+<button id="publishBtn">Pubblica nel marketplace</button>
+<div id="publishStatus" class="status"></div>
+</section>
+
+<section id="mine" class="card hidden">
+<h2>I miei annunci</h2>
+<div id="mineOutput"></div>
+</section>
+
+<section id="offers" class="card hidden">
+<h2>Offerte</h2>
+<div id="offersOutput"></div>
+</section>
+
+<section id="transactions" class="card hidden">
+<h2>Transazioni</h2>
+<div id="transactionsOutput"></div>
+</section>
+
+<section id="offerForm" class="card hidden">
+<h2>Fai offerta</h2>
+<div id="offerTitle" class="muted"></div>
+<input id="offerListingId" type="hidden">
+<input id="offerQty" type="number" step="0.01" placeholder="Quantità">
+<input id="offerPrice" type="number" step="0.01" placeholder="Prezzo unitario €">
+<textarea id="offerMessage" placeholder="Messaggio opzionale"></textarea>
+<div class="row">
+<button id="sendOfferBtn">Invia offerta</button>
+<button class="secondary" id="cancelOfferBtn">Annulla</button>
+</div>
+<div id="offerStatus" class="status"></div>
+</section>
+
+</main>
+
+<script>
+const SUPABASE_URL = 'https://dneascaddmtauntlimpi.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_4vVAwKpUYS3y3__Z4I7HgA_qnL-TEZn';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const $ = id => document.getElementById(id);
+
+function esc(v){
+  return String(v ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[c]);
+}
+
+function show(id){
+  ['marketplace','publish','mine','offers','transactions','offerForm']
+    .forEach(x => $(x).classList.add('hidden'));
+  $(id).classList.remove('hidden');
+}
+
+async function getUser(){
+  const {data} = await db.auth.getUser();
+  return data.user || null;
+}
+
+async function getCompany(){
+  const {data,error} = await db.rpc('my_company_id');
+  if(error) return null;
+  return data;
+}
+
+async function refreshAccount(){
+  const u = await getUser();
+  $('accountStatus').textContent =
+    u ? 'Connesso: ' + u.email : 'Non connesso';
+}
+
+$('registerBtn').onclick = async () => {
+  const email = $('email').value.trim();
+  const password = $('password').value;
+
+  if(!email || password.length < 6){
+    $('accountStatus').textContent =
+      'Inserisci email e password di almeno 6 caratteri.';
+    return;
+  }
+
+  const {data,error} = await db.auth.signUp({email,password});
+
+  $('accountStatus').textContent =
+    error ? 'Errore: ' + error.message :
+    data.session ? 'Registrazione completata.' :
+    'Registrazione completata. Controlla la mail se richiesta.';
+
+  await refreshAccount();
+};
+
+$('loginBtn').onclick = async () => {
+  const {error} = await db.auth.signInWithPassword({
+    email:$('email').value.trim(),
+    password:$('password').value
+  });
+
+  if(error){
+    $('accountStatus').textContent='Errore: '+error.message;
+    return;
+  }
+
+  await refreshAccount();
+  await loadMarket();
+};
+
+$('logoutBtn').onclick = async () => {
+  await db.auth.signOut();
+  await refreshAccount();
+};
+
+async function ensureCompany(){
+  const u = await getUser();
+
+  if(!u){
+    $('publishStatus').textContent='Prima devi accedere.';
+    return null;
+  }
+
+  let companyId = await getCompany();
+  if(companyId) return companyId;
+
+  const name=$('companyName').value.trim();
+  const vat=$('vat').value.trim();
+
+  if(!name || !vat){
+    $('publishStatus').textContent =
+      'Per il primo annuncio inserisci Nome ditta e Partita IVA.';
+    return null;
+  }
+
+  const {data,error}=await db.rpc('create_company_and_join',{
+    p_name:name,
+    p_vat:vat,
+    p_sector:$('sector').value.trim() || null,
+    p_city:$('city').value.trim() || null,
+    p_province:$('province').value.trim() || null,
+    p_ships:true
+  });
+
+  if(error){
+    $('publishStatus').textContent='Errore azienda: '+error.message;
+    return null;
+  }
+
+  companyId = await getCompany();
+  return companyId || data;
+}
+
+$('publishBtn').onclick = async () => {
+  $('publishStatus').textContent='Pubblicazione...';
+
+  const companyId=await ensureCompany();
+  if(!companyId) return;
+
+  const title=$('title').value.trim();
+  const quantity=Number($('quantity').value);
+  const price=Number($('price').value);
+  const unit=$('unit').value.trim();
+
+  if(!title || quantity<=0 || price<0 || !unit){
+    $('publishStatus').textContent =
+      'Compila titolo, quantità, unità e prezzo.';
+    return;
+  }
+
+  const fullLot=$('fullLotPrice').value.trim();
+
+  const {error}=await db.rpc('create_listing',{
+    p_title:title,
+    p_description:$('description').value.trim() || null,
+    p_quantity:quantity,
+    p_unit:unit,
+    p_unit_price:price,
+    p_category_id:null,
+    p_category_text:$('category').value.trim() || 'Altro',
+    p_condition:'Nuovo',
+    p_location:$('location').value.trim() || null,
+    p_ships:true,
+    p_min_qty:Number($('minQty').value || 1),
+    p_full_lot_price:fullLot ? Number(fullLot) : null,
+    p_accepts_offers:true,
+    p_liquidate_fast:false,
+    p_status:'active'
+  });
+
+  if(error){
+    $('publishStatus').textContent='Errore: '+error.message;
+    return;
+  }
+
+  $('publishStatus').textContent='ANNUNCIO PUBBLICATO NEL DATABASE NEXUS';
+  await loadMarket();
+  show('marketplace');
+};
+
+async function loadMarket(){
+  show('marketplace');
+  $('marketOutput').innerHTML='<p class="muted">Caricamento...</p>';
+
+  const {data,error}=await db.rpc('marketplace_feed',{
+    p_limit:50,
+    p_offset:0
+  });
+
+  if(error){
+    $('marketOutput').innerHTML=
+      '<p class="error">'+esc(error.message)+'</p>';
+    return;
+  }
+
+  const rows=data || [];
+
+  $('marketOutput').innerHTML =
+    rows.length ? rows.map(x => `
+      <div class="item">
+        <h3>${esc(x.title)}</h3>
+        <div class="muted">${esc(x.company_name || '')}</div>
+        <div>${esc(x.quantity)} ${esc(x.unit || '')}</div>
+        <div class="price">€ ${esc(x.unit_price)}</div>
+        <div class="muted">${esc(x.location || '')}</div>
+        <br>
+        <button class="offerButton"
+          data-id="${esc(x.id)}"
+          data-title="${esc(x.title)}"
+          data-price="${esc(x.unit_price)}">
+          Fai offerta
+        </button>
+      </div>
+    `).join('') :
+    '<p class="muted">Nessun annuncio disponibile.</p>';
+
+  document.querySelectorAll('.offerButton').forEach(btn => {
+    btn.onclick = async () => {
+      if(!await getUser()){
+        alert('Prima devi accedere.');
+        return;
+      }
+
+      $('offerListingId').value=btn.dataset.id;
+      $('offerTitle').textContent=btn.dataset.title;
+      $('offerPrice').value=btn.dataset.price;
+      $('offerQty').value=1;
+      $('offerMessage').value='';
+      $('offerStatus').textContent='';
+      show('offerForm');
+    };
+  });
+}
+
+$('sendOfferBtn').onclick = async () => {
+  const quantity=Number($('offerQty').value);
+  const price=Number($('offerPrice').value);
+
+  if(quantity<=0 || price<=0){
+    $('offerStatus').textContent='Quantità o prezzo non validi.';
+    return;
+  }
+
+  const {error}=await db.rpc('create_offer',{
+    p_listing_id:$('offerListingId').value,
+    p_quantity:quantity,
+    p_price:price,
+    p_message:$('offerMessage').value.trim() || null
+  });
+
+  if(error){
+    $('offerStatus').textContent='Errore: '+error.message;
+    return;
+  }
+
+  $('offerStatus').textContent='Offerta inviata.';
+  await loadOffers();
+};
+
+$('cancelOfferBtn').onclick=loadMarket;
+
+async function loadMine(){
+  if(!await getUser()){
+    alert('Prima devi accedere.');
+    return;
+  }
+
+  show('mine');
+
+  const {data,error}=await db.rpc('my_listings',{
+    p_status:null,
+    p_limit:50,
+    p_offset:0
+  });
+
+  if(error){
+    $('mineOutput').innerHTML='<p class="error">'+esc(error.message)+'</p>';
+    return;
+  }
+
+  $('mineOutput').innerHTML=(data||[]).map(x=>`
+    <div class="item">
+      <strong>${esc(x.title)}</strong><br>
+      Stock: ${esc(x.quantity)} ${esc(x.unit||'')}<br>
+      Stato: ${esc(x.status)}
+    </div>
+  `).join('') || '<p class="muted">Nessun annuncio.</p>';
+}
+
+async function loadOffers(){
+  if(!await getUser()){
+    alert('Prima devi accedere.');
+    return;
+  }
+
+  show('offers');
+
+  const companyId=await getCompany();
+
+  const {data,error}=await db.rpc('offer_inbox',{
+    p_side:'all',
+    p_status:null,
+    p_limit:50,
+    p_offset:0
+  });
+
+  if(error){
+    $('offersOutput').innerHTML='<p class="error">'+esc(error.message)+'</p>';
+    return;
+  }
+
+  const rows=data || [];
+
+  $('offersOutput').innerHTML=rows.map(o=>{
+    const seller=o.seller_company_id===companyId;
+    const active=['pending','countered'].includes(o.status);
+
+    return `
+      <div class="item">
+        <strong>${seller?'Offerta ricevuta':'Offerta inviata'}</strong><br>
+        Stato: ${esc(o.status)}<br>
+        Quantità: ${esc(o.quantity)}<br>
+        Prezzo: € ${esc(o.price)}
+        ${o.message?'<br>'+esc(o.message):''}
+
+        ${seller && active ? `
+          <div class="row">
+            <button class="acceptOffer" data-id="${o.id}">
+              Accetta
+            </button>
+            <button class="danger rejectOffer" data-id="${o.id}">
+              Rifiuta
+            </button>
+            <button class="secondary counterOffer"
+              data-id="${o.id}"
+              data-q="${o.quantity}"
+              data-p="${o.price}">
+              Controfferta
+            </button>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }).join('') || '<p class="muted">Nessuna offerta.</p>';
+
+  document.querySelectorAll('.acceptOffer').forEach(b=>{
+    b.onclick=async()=>{
+      const {error}=await db.rpc('accept_offer_atomic',{
+        p_offer_id:b.dataset.id
+      });
+
+      if(error) alert(error.message);
+      else await loadOffers();
+    };
+  });
+
+  document.querySelectorAll('.rejectOffer').forEach(b=>{
+    b.onclick=async()=>{
+      const {error}=await db.rpc('reject_offer',{
+        p_offer_id:b.dataset.id
+      });
+
+      if(error) alert(error.message);
+      else await loadOffers();
+    };
+  });
+
+  document.querySelectorAll('.counterOffer').forEach(b=>{
+    b.onclick=async()=>{
+      const q=prompt('Nuova quantità:',b.dataset.q);
+      if(q===null) return;
+
+      const p=prompt('Nuovo prezzo unitario:',b.dataset.p);
+      if(p===null) return;
+
+      const message=prompt('Messaggio opzionale:','');
+
+      const {error}=await db.rpc('counter_offer',{
+        p_offer_id:b.dataset.id,
+        p_quantity:Number(q),
+        p_price:Number(p),
+        p_message:message || null
+      });
+
+      if(error) alert(error.message);
+      else await loadOffers();
+    };
+  });
+}
+
+async function loadTransactions(){
+  if(!await getUser()){
+    alert('Prima devi accedere.');
+    return;
+  }
+
+  show('transactions');
+
+  const {data,error}=await db.rpc('my_transactions',{
+    p_limit:50,
+    p_offset:0
+  });
+
+  if(error){
+    $('transactionsOutput').innerHTML=
+      '<p class="error">'+esc(error.message)+'</p>';
+    return;
+  }
+
+  $('transactionsOutput').innerHTML=(data||[]).map(t=>`
+    <div class="item">
+      <strong>Transazione</strong><br>
+      Quantità: ${esc(t.quantity)}<br>
+      Prezzo: € ${esc(t.price)}<br>
+      Stato: ${esc(t.status || 'completata')}
+    </div>
+  `).join('') || '<p class="muted">Nessuna transazione.</p>';
+}
+
+$('marketBtn').onclick=loadMarket;
+$('publishTabBtn').onclick=()=>show('publish');
+$('mineBtn').onclick=loadMine;
+$('offersBtn').onclick=loadOffers;
+$('transactionsBtn').onclick=loadTransactions;
+
+refreshAccount();
+loadMarket();
+</script>
+
+</body>
+</html>
