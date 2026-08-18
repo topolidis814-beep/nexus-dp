@@ -1,88 +1,222 @@
-button class="secondary" id="btnOffers">Offerte</button>
-  <button class="secondary" id="btnTx">Transazioni</button>
-</div>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEXUS | Marketplace B2B</title>
 
-<p id="msg" class="muted"></p>
-<div id="out"></div>
+  <style>
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,sans-serif;
+      background:#07111f;
+      color:#f5f7fa;
+    }
+    main{
+      max-width:900px;
+      margin:auto;
+      padding:32px 20px 70px;
+    }
+    h1{
+      font-size:48px;
+      margin:20px 0 12px;
+    }
+    h2{margin-top:0}
+    .muted{color:#9caabd}
+    .hero{margin-bottom:30px}
+    .card{
+      background:#102238;
+      border:1px solid #24415e;
+      border-radius:22px;
+      padding:24px;
+      margin:18px 0;
+    }
+    button{
+      border:0;
+      border-radius:14px;
+      padding:15px 20px;
+      font-size:17px;
+      font-weight:700;
+      cursor:pointer;
+      margin:5px 4px 5px 0;
+    }
+    .primary{
+      background:#39d5a5;
+      color:#052116;
+    }
+    .secondary{
+      background:#152b44;
+      color:white;
+      border:1px solid #294866;
+    }
+    input,textarea{
+      width:100%;
+      padding:14px;
+      margin:6px 0 14px;
+      border-radius:12px;
+      border:1px solid #304b67;
+      background:#071523;
+      color:white;
+      font-size:16px;
+    }
+    textarea{min-height:100px}
+    label{display:block;color:#cbd5e1}
+    .nav{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin:20px 0;
+    }
+    .hidden{display:none}
+    .listing{
+      padding:16px;
+      background:#0b1b2d;
+      border-radius:14px;
+      margin-top:12px;
+    }
+    #msg{
+      margin-top:14px;
+      color:#39d5a5;
+      font-weight:bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<main>
+
+  <section class="hero">
+    <div class="muted">NEXUS · Marketplace professionale B2B</div>
+    <h1>Stock fermo in liquidità.</h1>
+    <p class="muted">
+      NEXUS mette in contatto aziende con eccedenze, rimanenze,
+      fine serie e attrezzature con aziende alla ricerca di opportunità.
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>Account NEXUS</h2>
+
+    <label>Email</label>
+    <input id="email" type="email" placeholder="azienda@esempio.it">
+
+    <label>Password</label>
+    <input id="password" type="password" placeholder="Minimo 6 caratteri">
+
+    <button class="secondary" onclick="registerUser()">Registrati</button>
+    <button class="secondary" onclick="loginUser()">Accedi</button>
+
+    <div id="accountStatus" class="muted">Non connesso</div>
+  </section>
+
+  <div class="nav">
+    <button class="primary" onclick="showSection('marketplace')">Marketplace</button>
+    <button class="secondary" onclick="showSection('publish')">Pubblica merce</button>
+    <button class="secondary" onclick="showSection('offers')">Offerte</button>
+    <button class="secondary" onclick="showSection('transactions')">Transazioni</button>
+  </div>
+
+  <section id="marketplace" class="card">
+    <h2>Marketplace</h2>
+    <p class="muted">Opportunità disponibili nel network NEXUS.</p>
+    <div id="listingOutput"></div>
+  </section>
+
+  <section id="publish" class="card hidden">
+    <h2>Pubblica merce</h2>
+
+    <label>Nome ditta</label>
+    <input id="companyName" placeholder="Nome azienda">
+
+    <label>Partita IVA / identificativo fiscale</label>
+    <input id="vat" placeholder="Partita IVA">
+
+    <label>Titolo</label>
+    <input id="title" placeholder="Titolo dell'annuncio">
+
+    <label>Categoria</label>
+    <input id="category" placeholder="Stock / macchinari / materiali">
+
+    <label>Quantità</label>
+    <input id="quantity" type="number" placeholder="100">
+
+    <label>Unità</label>
+    <input id="unit" placeholder="pz, kg, pallet...">
+
+    <label>Prezzo unitario €</label>
+    <input id="price" type="number" step="0.01" placeholder="100">
+
+    <label>Località</label>
+    <input id="location" placeholder="Milano">
+
+    <label>Descrizione</label>
+    <textarea id="description" placeholder="Descrizione della merce"></textarea>
+
+    <button class="primary" onclick="publishListing()">
+      Pubblica nel marketplace
+    </button>
+
+    <div id="msg"></div>
+  </section>
+
+  <section id="offers" class="card hidden">
+    <h2>Offerte</h2>
+    <p class="muted">Area gestione offerte NEXUS.</p>
+  </section>
+
+  <section id="transactions" class="card hidden">
+    <h2>Transazioni</h2>
+    <p class="muted">Area transazioni NEXUS.</p>
+  </section>
 
 </main>
 
-<div class="modal" id="accesso">
-<div class="card">
+<script>
+function showSection(id){
+  ['marketplace','publish','offers','transactions']
+    .forEach(x => document.getElementById(x).classList.add('hidden'));
 
-<span class="close" id="closeAccess">✕</span>
+  document.getElementById(id).classList.remove('hidden');
+}
 
-<h2>Account NEXUS</h2>
+function registerUser(){
+  document.getElementById('accountStatus').textContent =
+    'Registrazione pronta per collegamento Supabase.';
+}
 
-<label>Email</label>
-<input id="email" type="email" placeholder="azienda@esempio.it">
+function loginUser(){
+  document.getElementById('accountStatus').textContent =
+    'Accesso pronto per collegamento Supabase.';
+}
 
-<label>Password</label>
-<input id="password" type="password" placeholder="Minimo 6 caratteri">
+function publishListing(){
 
-<div class="row">
-  <button id="btnSignup">Registrati</button>
-  <button class="secondary" id="btnLogin">Accedi</button>
-  <button class="secondary" id="btnLogout">Esci</button>
-</div>
+  const title = document.getElementById('title').value.trim();
+  const quantity = document.getElementById('quantity').value;
+  const price = document.getElementById('price').value;
 
-<p id="authMessage" class="muted"></p>
+  if(!title){
+    document.getElementById('msg').textContent =
+      'Inserisci almeno il titolo.';
+    return;
+  }
 
-</div>
-</div>
+  document.getElementById('listingOutput').innerHTML += `
+    <div class="listing">
+      <strong>${title}</strong><br>
+      Quantità: ${quantity || '-'}<br>
+      Prezzo unitario: € ${price || '-'}
+    </div>
+  `;
 
-<div class="modal" id="pubblica">
-<div class="card">
+  document.getElementById('msg').textContent =
+    'Interfaccia funzionante. Annuncio aggiunto al marketplace.';
 
-<span class="close" id="closePublish">✕</span>
+  showSection('marketplace');
+}
+</script>
 
-<h2>Pubblica merce</h2>
-
-<label>Nome ditta</label>
-<input id="companyName" placeholder="Nome azienda">
-
-<label>Partita IVA / identificativo fiscale</label>
-<input id="vat" placeholder="Partita IVA">
-
-<label>Titolo</label>
-<input id="title" placeholder="Titolo del lotto">
-
-<label>Categoria</label>
-<input id="category" placeholder="Stock / rimanenze">
-
-<label>Quantità</label>
-<input id="quantity" type="number" min="0.01" step="0.01" placeholder="Quantità">
-
-<label>Unità</label>
-<input id="unit" placeholder="pz, kg, pallet...">
-
-<label>Prezzo unitario €</label>
-<input id="price" type="number" min="0" step="0.01" placeholder="100">
-
-<label>Località</label>
-<input id="location" placeholder="Milano">
-
-<label>Descrizione</label>
-<textarea id="description" placeholder="Descrizione della merce"></textarea>
-
-<button id="btnPublish">Pubblica nel marketplace</button>
-
-<p id="publishMessage" class="muted"></p>
-
-</div>
-</div>
-
-<script type="module">
-
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-const supabase = createClient(
-  'https://dneascaddmtauntlimpi.supabase.co',
-  'sb_publishable_4vVAwKpUYS3y3__Z4I7HgA_qnL-TEZn'
-);
-
-const $ = id => document.getElementById(id);
-
-function escapeHtml(value){
-  return String(value ?? '').replace(/[&<>"']/g,c=>({
-    '&':'&amp;',
+</body>
+</html>
