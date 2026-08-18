@@ -1,0 +1,33 @@
+NEXUS MVP — CAPITOLO 13 / REGRESSION TEST
+
+TEST BACKEND / INTEGRITÀ DATI
+PASS — 1 listing presente, attivo e approved
+PASS — 5 offerte presenti
+PASS — 3 transazioni presenti
+PASS — 0 transazioni duplicate per offer_id
+PASS — 0 stock negativi
+PASS — 0 offerte con quantità/prezzo non validi
+PASS — 0 transazioni con quantità/prezzo non validi
+PASS — 0 offerte orfane rispetto ai listing
+PASS — 0 transazioni orfane rispetto a listing/offerta
+
+TEST INFRASTRUTTURA
+PASS — progetto Vercel di produzione individuato
+PASS — ultimo deployment production: READY
+PASS — repository GitHub collegato: nexus-dp / main
+PASS — runtime errors Vercel ultimi 7 giorni: nessuno rilevato
+
+TEST STATICI FRONTEND MVP
+PASS — Marketplace/categorie/filtri presenti nel file cumulativo
+PASS — Scheda prodotto e gallery presenti
+PASS — Flusso create_offer / counter_offer / reject_offer / accept_offer_atomic integrato
+PASS — Transazioni visuali integrate
+PASS — Segnalazioni e moderazione integrate
+PASS — Ottimizzazioni performance Capitolo 12 mantenute
+
+LIMITI DEL TEST AUTOMATICO
+I test browser end-to-end autenticati con due sessioni reali e fotocamera/galleria fisica mobile non sono simulati da questo pacchetto. La baseline buyer/seller era già stata verificata nelle fasi precedenti; il Capitolo 13 ha verificato che i dati correnti non presentino regressioni strutturali.
+
+ESITO
+REGRESSION GATE: PASS per integrità database, deployment corrente e struttura MVP.
+Pronto per CAPITOLO 14 — RELEASE MVP.

@@ -1,0 +1,13 @@
+NEXUS MVP — CAPITOLO 14 / RELEASE GATE
+
+BACKEND: regression gate PASS.
+VERCEL INFRASTRUCTURE: production deployment READY, HTTP 200, no runtime errors detected in prior 7-day check.
+IMPORTANT RELEASE FINDING:
+The currently published production frontend is still the older interface. Direct production inspection shows the old loadOffers() condition:
+  seller && active
+so the buyer-side counteroffer action bug remains in the currently published frontend.
+The cumulative MVP frontend produced through Chapters 1–13 is therefore a RELEASE CANDIDATE package, NOT yet verified as the live production release.
+
+No destructive deployment was performed automatically because the available Vercel deploy action deploys the current connected workspace, while the cumulative candidate exists as a generated package and is not established as the connected Git working tree.
+
+RELEASE GATE: BLOCKED ONLY ON PROMOTION OF THE CUMULATIVE FRONTEND TO THE CONNECTED nexus-dp/main production source.
