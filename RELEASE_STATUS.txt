@@ -1,13 +1,10 @@
-NEXUS MVP — CAPITOLO 14 / RELEASE GATE
+NEXUS MVP FINAL RELEASE
+Audit date: 2026-08-19
+Application baseline: FINAL-V3
+Source artifact SHA-256: 5ad2851b09a077efc2600268cc1028eeccb924930ea315d5f6bccac168e6373e
 
-BACKEND: regression gate PASS.
-VERCEL INFRASTRUCTURE: production deployment READY, HTTP 200, no runtime errors detected in prior 7-day check.
-IMPORTANT RELEASE FINDING:
-The currently published production frontend is still the older interface. Direct production inspection shows the old loadOffers() condition:
-  seller && active
-so the buyer-side counteroffer action bug remains in the currently published frontend.
-The cumulative MVP frontend produced through Chapters 1–13 is therefore a RELEASE CANDIDATE package, NOT yet verified as the live production release.
-
-No destructive deployment was performed automatically because the available Vercel deploy action deploys the current connected workspace, while the cumulative candidate exists as a generated package and is not established as the connected Git working tree.
-
-RELEASE GATE: BLOCKED ONLY ON PROMOTION OF THE CUMULATIVE FRONTEND TO THE CONNECTED nexus-dp/main production source.
+IMPLEMENTATO (sorgente verificato): marketplace, categorie, ricerca/filtri, scheda prodotto, pubblicazione, fotografie multiple, offerte/controfferte, accettazione/rifiuto, transazioni UI, deal MVP, preferiti, segnalazioni, responsive.
+TESTATO (pregresso verificato): publish→offer→counteroffer→accept→transaction→stock 10→8.
+VERIFICATO 2026-08-19: V3, SHA originale, sintassi JS, Storage/RLS/RPC, favorites, reports, runtime Vercel.
+PRODUCTION: deployment corrente READY e V3 servita (verifica precedente della sessione); runtime errors 7d: nessuno.
+SECURITY: accesso anon a get_nexus_release_html rimosso e verificato. Leaked Password Protection: NON ABILITATA.

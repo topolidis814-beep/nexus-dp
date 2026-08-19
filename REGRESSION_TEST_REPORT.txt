@@ -1,0 +1,10 @@
+NEXUS REGRESSION TEST REPORT — 2026-08-19
+
+E2E BASELINE GIÀ VERIFICATA, NON RIPETUTA SENZA NECESSITÀ:
+Seller publish → buyer offer 2×€80 → seller counteroffer 2×€90 → buyer accept → transaction → stock 10→8: PASS.
+DB: offer accepted, transaction presente, nessuno stock negativo, nessuna transazione duplicata per offer: PASS.
+
+AUDIT CORRENTE:
+Original V3 SHA-256 PASS; JavaScript syntax PASS; duplicate HTML IDs 0; entrypoints coherent; service-role frontend absent; product-images absent; listing-images/product_images pipeline present; publishing chain present; favorites/reports schema+RLS verified; negotiation and atomic acceptance RPC inspected; Vercel runtime errors 7d none.
+
+Nessuna RPC commerciale modificata durante l'audit conclusivo.

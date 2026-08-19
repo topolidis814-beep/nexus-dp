@@ -1,0 +1,10 @@
+NEXUS SECURITY AUDIT SUMMARY — 2026-08-19
+
+VERIFICATO:
+RLS su tabelle sensibili; nessuna service-role nel frontend; listing-images max 5 MiB e MIME JPEG/PNG/WebP; Storage ownership/listing checks; self-offer/quantity/stock/rate controls; negotiation turn controls; atomic acceptance and stock decrement; transaction idempotency protections; inspected SECURITY DEFINER functions have explicit search_path.
+
+HARDENING APPLICATO:
+get_nexus_release_html(text): EXECUTE anon rimosso in Production e verificato anon_execute=false.
+
+RESIDUO NON BLOCCANTE:
+Supabase Leaked Password Protection disabilitata al momento dell'audit. Security advisor mantiene warning su RPC SECURITY DEFINER autenticati; quelli ispezionati sono intenzionali e protetti da controlli interni.
