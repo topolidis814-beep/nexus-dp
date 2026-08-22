@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NEXUS — Marketplace B2B</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#07111f;color:#f5f7fa;font-family:Arial,sans-serif;padding-bottom:76px}
+button,input,select,textarea{font:inherit}
+.wrap{max-width:1180px;margin:auto;padding:0 16px}
+.top{position:sticky;top:0;z-index:20;background:#07111ff2;border-bottom:1px solid #203a55}
+.topin{min-height:66px;display:flex;align-items:center;gap:12px}
+.brand{font-weight:900;letter-spacing:.15em;white-space:nowrap}.brand b,.price{color:#39d5a5}
+.search{flex:1}
+.search input,.filters input,.filters select,.field input,.field select,.field textarea{
+ width:100%;padding:12px;border-radius:11px;border:1px solid #294866;background:#0b1929;color:white
+}
+.btn{border:0;border-radius:11px;padding:12px 15px;background:#39d5a5;color:#052116;font-weight:800;cursor:pointer}
+.btn.alt{background:#14283d;color:white}.btn.danger{background:#642536;color:white}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.hero{padding:34px 0 16px}.hero h1{font-size:clamp(36px,7vw,62px);line-height:1;margin:0 0 12px}
+.muted{color:#9fb0c5}.small{font-size:12px;color:#9fb0c5}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;margin:10px 0 18px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+.card{background:#0e1d2e;border:1px solid #203a55;border-radius:17px;overflow:hidden;cursor:pointer}
+.photo{aspect-ratio:4/3;background:#102238;display:flex;align-items:center;justify-content:center;color:#71859a}
+.photo img{width:100%;height:100%;object-fit:cover}
+.body{padding:13px}.company{font-size:11px;color:#9fb0c5;text-transform:uppercase}
+.title{font-size:16px;font-weight:800;margin:6px 0}.price{font-size:21px;font-weight:900}
+.meta{font-size:12px;color:#9fb0c5;margin-top:6px}.empty{grid-column:1/-1;padding:38px;text-align:center;color:#9fb0c5}
+.panel,.modal{position:fixed;inset:0;z-index:70;background:#07111f;display:none;overflow:auto;padding-bottom:90px}
+.panel.on,.modal.on{display:block}
+.head{position:sticky;top:0;z-index:2;background:#07111ff2;border-bottom:1px solid #203a55;padding:12px 16px}
+.sheet{max-width:760px;margin:20px auto;padding:16px}
+.box{background:#0e1d2e;border:1px solid #203a55;border-radius:16px;padding:15px;margin-bottom:12px}
+.field{margin:10px 0}.field label{display:block;font-size:12px;color:#9fb0c5;margin-bottom:5px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.actions{display:flex;gap:8px;flex-wrap:wrap}
+.status{min-height:20px;margin-top:8px;color:#39d5a5;overflow-wrap:anywhere}
+.badge{display:inline-block;padding:4px 7px;border-radius:999px;background:#163126;color:#6ee7b7;font-size:10px;font-weight:800;margin-top:6px}
+.bottom{display:none}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){
+ body{padding-bottom:82px}.topin{padding:9px 0}.brand{font-size:15px}.search input{min-width:0}.grid{grid-template-columns:1fr;gap:10px}
+ .filters{grid-template-columns:1fr}.row{grid-template-columns:1fr}.hero{padding-top:28px}
+ .bottom{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;bottom:0;left:0;right:0;z-index:50;background:#0a1726f7;border-top:1px solid #203a55;padding:7px 4px calc(7px + env(safe-area-inset-bottom))}
+ .bottom button{border:0;background:none;color:#b5c3d1;font-size:10px;min-height:48px}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap topin">
+ <div class="brand">NE<b>X</b>US</div>
+ <div class="search"><input id="q" placeholder="Cerca stock, materiali, macchinari…"></div>
+ <button class="btn" id="publish" type="button">+ Pubblica</button>
+</div></header>
+
+<main class="wrap">
+<section class="hero"><h1>Stock fermo.<br>Nuove opportunità.</h1><p class="muted">Marketplace professionale B2B per eccedenze, fine serie, materiali e attrezzature.</p></section>
+<div class="bar"><h2>Marketplace</h2><button class="btn alt" id="account" type="button">Accesso</button></div>
+<div class="filters">
+ <select id="category"><option value="">Tutte le categorie</option></select>
+ <input id="location" placeholder="Località">
+ <select id="sort"><option value="new">Più recenti</option><option value="low">Prezzo crescente</option><option value="high">Prezzo decrescente</option></select>
+</div>
+<section class="grid" id="grid"><div class="empty">Caricamento…</div></section>
+</main>
+
+<nav class="bottom">
+<button id="homeNav" type="button">⌂<br>Home</button>
+<button id="catNav" type="button">▦<br>Categorie</button>
+<button id="pubNav" type="button">＋<br>Pubblica</button>
+<button id="offersNav" type="button">↔<br>Offerte</button>
+<button id="txNav" type="button">✓<br>Transazioni</button>
+</nav>
+
+<section class="panel" id="authPanel"><div class="head"><button class="btn alt close" type="button">← Marketplace</button> <b>Account NEXUS</b></div><div class="sheet">
+<div class="box"><h2>Accesso</h2>
+<div class="field"><label>Email</label><input id="email" type="email" autocomplete="email"></div>
+<div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password"></div>
+<div class="actions"><button class="btn" id="login" type="button">Accedi</button><button class="btn alt" id="signup" type="button">Registrati</button><button class="btn danger" id="logout" type="button" style="display:none">Esci</button></div>
+<div class="status" id="authStatus"></div></div>
+<div class="box" id="companyBox" style="display:none"><h3>Azienda</h3><p class="small">Necessaria per pubblicare annunci.</p>
+<div class="field"><label>Ragione sociale</label><input id="companyName"></div>
+<div class="row"><div class="field"><label>Partita IVA</label><input id="vat"></div><div class="field"><label>Città</label><input id="city"></div></div>
+<button class="btn" id="createCompany" type="button">Crea azienda</button><div class="status" id="companyStatus"></div></div>
+</div></section>
+
+<section class="panel" id="publishPanel"><div class="head"><button class="btn alt close" type="button">← Marketplace</button> <b>Pubblica annuncio</b></div><div class="sheet"><div class="box">
+<div class="field"><label>Titolo</label><input id="pTitle"></div>
+<div class="row"><div class="field"><label>Categoria</label><input id="pCategory"></div><div class="field"><label>Località</label><input id="pLocation"></div></div>
+<div class="field"><label>Descrizione</label><textarea id="pDescription" rows="4"></textarea></div>
+<div class="row"><div class="field"><label>Quantità</label><input id="pQty" type="number" min="1" value="1"></div><div class="field"><label>Quantità minima</label><input id="pMin" type="number" min="1" value="1"></div></div>
+<div class="row"><div class="field"><label>Prezzo unitario €</label><input id="pPrice" type="number" min=".01" step=".01"></div><div class="field"><label>Prezzo lotto € (opzionale)</label><input id="pLot" type="number" min=".01" step=".01"></div></div>
+<div class="field"><label><input id="pQuick" type="checkbox"> Liquidazione rapida</label></div>
+<div class="field"><label>Foto (JPEG/PNG/WebP, max 5 MB ciascuna)</label><input id="pPhotos" type="file" accept="image/jpeg,image/png,image/webp" multiple></div>
+<button class="btn" id="createListing" type="button">Pubblica</button><div class="status" id="publishStatus"></div>
+</div></div></section>
+
+<section class="modal" id="productPanel"><div class="head"><button class="btn alt close" type="button">← Marketplace</button> <b>Prodotto</b></div><div class="sheet" id="productContent"></div></section>
+<section class="panel" id="offersPanel"><div class="head"><button class="btn alt close" type="button">← Marketplace</button> <b>Offerte</b></div><div class="sheet" id="offersList"></div></section>
+<section class="panel" id="txPanel"><div class="head"><button class="btn alt close" type="button">← Marketplace</button> <b>Transazioni</b></div><div class="sheet" id="txList"></div></section>
+
+<script>
+const U='https://dneascaddmtauntlimpi.supabase.co';
+const K='sb_publishable_4vVAwKpUYS3y3__Z4I7HgA_qnL-TEZn';
+const db=supabase.createClient(U,K);
+const $=id=>document.getElementById(id);
+let rows=[],selected=null;
+
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>Number(n||0).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
+const errMsg=e=>e?.message||String(e||'Errore sconosciuto');
+
+function closeAll(){document.querySelectorAll('.panel,.modal').forEach(x=>x.classList.remove('on'));document.body.style.overflow=''}
+function openPanel(id){closeAll();const el=$(id);if(el){el.classList.add('on');document.body.style.overflow='hidden'}}
+document.querySelectorAll('.close').forEach(b=>b.addEventListener('click',closeAll));
+
+$('homeNav').addEventListener('click',()=>{closeAll();window.scrollTo({top:0,behavior:'smooth'})});
+$('account').addEventListener('click',()=>{openPanel('authPanel');refreshSession()});
+$('publish').addEventListener('click',openPublish);
+$('pubNav').addEventListener('click',openPublish);
+$('offersNav').addEventListener('click',loadOffers);
+$('txNav').addEventListener('click',loadTx);
+$('catNav').addEventListener('click',()=>{closeAll();$('category').scrollIntoView({behavior:'smooth',block:'center'});$('category').focus()});
+
+async function user(){const {data,error}=await db.auth.getUser();if(error)throw error;return data.user}
+async function companyId(){const {data,error}=await db.rpc('my_company_id');if(error)throw error;return Array.isArray(data)?(data[0]?.company_id??data[0]?.id??data[0]??null):data}
+
+async function refreshSession(){
+ try{
+  const u=await user();
+  $('logout').style.display=u?'inline-block':'none';
+  $('login').style.display=u?'none':'inline-block';
+  $('signup').style.display=u?'none':'inline-block';
+  $('account').textContent=u?'Account':'Accesso';
+  $('authStatus').textContent=u?'Connesso: '+u.email:'Non connesso';
+  if(u){
+   let cid=null;try{cid=await companyId()}catch(_){}
+   $('companyBox').style.display=cid?'none':'block';
+  }else $('companyBox').style.display='none';
+ }catch(e){$('authStatus').textContent='Errore sessione: '+errMsg(e)}
+}
+
+$('login').addEventListener('click',async()=>{
+ const email=$('email').value.trim(),password=$('password').value;
+ if(!email||!password){$('authStatus').textContent='Inserisci email e password.';return}
+ $('authStatus').textContent='Accesso…';
+ const {error}=await db.auth.signInWithPassword({email,password});
+ $('authStatus').textContent=error?'Errore: '+error.message:'Accesso eseguito.';
+ await refreshSession();if(!error)await load();
+});
+
+$('signup').addEventListener('click',async()=>{
+ const email=$('email').value.trim(),password=$('password').value;
+ if(!email||password.length<6){$('authStatus').textContent='Inserisci email e password di almeno 6 caratteri.';return}
+ $('authStatus').textContent='Registrazione…';
+ const {error}=await db.auth.signUp({email,password});
+ $('authStatus').textContent=error?'Errore: '+error.message:'Registrazione effettuata. Controlla l’email se richiesta.';
+ await refreshSession();
+});
+
+$('logout').addEventListener('click',async()=>{await db.auth.signOut();await refreshSession();closeAll();await load()});
+
+$('createCompany').addEventListener('click',async()=>{
+ const name=$('companyName').value.trim();
+ if(!name){$('companyStatus').textContent='Inserisci la ragione sociale.';return}
+ $('companyStatus').textContent='Creazione…';
+ let res=await db.rpc('create_company_and_join',{p_name:name,p_vat:$('vat').value.trim()||null,p_country:'IT'});
+ if(res.error) res=await db.rpc('create_company',{p_name:name,p_vat_number:$('vat').value.trim()||null,p_city:$('city').value.trim()||null});
+ $('companyStatus').textContent=res.error?'Errore: '+res.error.message:'Azienda creata.';
+ if(!res.error)await refreshSession();
+});
+
+async function load(){
+ $('grid').innerHTML='<div class="empty">Caricamento…</div>';
+ let {data,error}=await db.rpc('marketplace_feed',{p_limit:50,p_offset:0});
+ if(error){
+  $('grid').innerHTML='<div class="empty">Marketplace non disponibile: '+esc(error.message)+'</div>';return;
+ }
+ rows=data||[];
+ const cats=[...new Set(rows.map(x=>x.category_name||x.category).filter(Boolean))].sort();
+ const old=$('category').value;
+ $('category').innerHTML='<option value="">Tutte le categorie</option>'+cats.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+ if(cats.includes(old))$('category').value=old;
+ render();
+}
+
+function imageUrl(path){return path?db.storage.from('product-images').getPublicUrl(path).data.publicUrl:''}
+function render(){
+ let a=[...rows],q=$('q').value.trim().toLowerCase(),c=$('category').value,loc=$('location').value.trim().toLowerCase();
+ if(q)a=a.filter(x=>[x.title,x.description,x.category_name,x.category,x.company_name,x.location].some(v=>String(v||'').toLowerCase().includes(q)));
+ if(c)a=a.filter(x=>(x.category_name||x.category)===c);
+ if(loc)a=a.filter(x=>String(x.location||'').toLowerCase().includes(loc));
+ if($('sort').value==='low')a.sort((x,y)=>Number(x.unit_price||x.price)-Number(y.unit_price||y.price));
+ if($('sort').value==='high')a.sort((x,y)=>Number(y.unit_price||y.price)-Number(x.unit_price||x.price));
+ $('grid').innerHTML=a.length?a.map(x=>{
+  const price=x.unit_price??x.price??0, qty=x.quantity??x.stock??0, img=x.image_path||x.first_image_path;
+  return `<article class="card" data-id="${esc(x.id)}"><div class="photo">${img?`<img src="${esc(imageUrl(img))}" alt="">`:'FOTO PRODOTTO'}</div><div class="body"><div class="company">${esc(x.company_name||'Azienda')}</div><div class="title">${esc(x.title||'Annuncio')}</div><div class="price">€ ${money(price)}</div><div class="meta">${esc(qty)} ${esc(x.unit||'pz')} · ${esc(x.location||'')}</div>${x.liquidate_fast||x.quick_sale?'<span class="badge">LIQUIDAZIONE</span>':''}</div></article>`
+ }).join(''):'<div class="empty">Nessun annuncio attivo.</div>';
+ document.querySelectorAll('.card[data-id]').forEach(el=>el.addEventListener('click',()=>showProduct(el.dataset.id)));
+}
+$('q').addEventListener('input',render);$('category').addEventListener('change',render);$('location').addEventListener('input',render);$('sort').addEventListener('change',render);
+
+async function openPublish(){
+ try{
+  if(!await user()){openPanel('authPanel');$('authStatus').textContent='Accedi prima di pubblicare.';return}
+  const cid=await companyId();
+  if(!cid){openPanel('authPanel');$('companyBox').style.display='block';$('companyStatus').textContent='Crea prima la tua azienda.';return}
+  openPanel('publishPanel');
+ }catch(e){openPanel('authPanel');$('authStatus').textContent='Errore: '+errMsg(e)}
+}
+
+$('createListing').addEventListener('click',async()=>{
+ const button=$('createListing');button.disabled=true;$('publishStatus').textContent='Pubblicazione…';
+ try{
+  const title=$('pTitle').value.trim(),category=$('pCategory').value.trim(),qty=Number($('pQty').value),min=Number($('pMin').value),price=Number($('pPrice').value);
+  if(!title||!category||!Number.isFinite(qty)||qty<1||!Number.isFinite(min)||min<1||min>qty||!Number.isFinite(price)||price<=0)throw new Error('Controlla titolo, categoria, quantità, minimo e prezzo.');
+  const cid=await companyId(),lot=$('pLot').value?Number($('pLot').value):null;
+  let r=await db.rpc('create_listing',{p_title:title,p_category:category,p_description:$('pDescription').value.trim(),p_quantity:qty,p_price:price,p_min_quantity:min,p_lot_price:lot,p_location:$('pLocation').value.trim()||null,p_quick_sale:$('pQuick').checked,p_company_id:cid});
+  if(r.error) r=await db.rpc('create_listing',{p_title:title,p_description:$('pDescription').value.trim(),p_category:category,p_condition:'used',p_location:$('pLocation').value.trim()||null,p_quantity:qty,p_unit:'pz',p_unit_price:price,p_min_qty:min,p_ships:true,p_accepts_offers:true,p_liquidate_fast:$('pQuick').checked});
+  if(r.error)throw r.error;
+  const listing=Array.isArray(r.data)?r.data[0]:r.data;
+  const listingId=listing?.id||listing;
+  const u=await user(),files=[...$('pPhotos').files];
+  for(let i=0;i<files.length;i++){
+   const f=files[i];if(f.size>5242880)throw new Error('Foto oltre 5 MB: '+f.name);
+   if(!/^image\/(jpeg|png|webp)$/.test(f.type))throw new Error('Formato foto non valido: '+f.name);
+   const ext=(f.name.split('.').pop()||'jpg').toLowerCase(),path=`${cid}/${listingId}/${crypto.randomUUID()}.${ext}`;
+   const up=await db.storage.from('product-images').upload(path,f,{contentType:f.type,upsert:false});if(up.error)throw up.error;
+   const ins=await db.from('product_images').insert({listing_id:listingId,owner_id:u.id,path,sort_order:i});if(ins.error)throw ins.error;
+  }
+  $('publishStatus').textContent='Annuncio pubblicato.';await load();setTimeout(closeAll,500);
+ }catch(e){$('publishStatus').textContent='Errore: '+errMsg(e)}
+ finally{button.disabled=false}
+});
+
+function showProduct(id){
+ selected=rows.find(x=>String(x.id)===String(id));if(!selected)return;
+ const im=imageUrl(selected.image_path||selected.first_image_path),price=selected.unit_price??selected.price??0,qty=selected.quantity??selected.stock??0,min=selected.min_qty??selected.min_quantity??1;
+ $('productContent').innerHTML=`<div class="box">${im?`<img src="${esc(im)}" style="width:100%;max-height:420px;object-fit:contain;border-radius:12px" alt="">`:''}<div class="company">${esc(selected.company_name||'Azienda')}</div><h2>${esc(selected.title)}</h2><div class="price">€ ${money(price)}</div><p>${esc(selected.description||'')}</p><p class="muted">Disponibili ${esc(qty)} ${esc(selected.unit||'pz')} · minimo ${esc(min)} · ${esc(selected.location||'')}</p>${selected.accepts_offers!==false?`<div class="row"><div class="field"><label>Quantità</label><input id="oQty" type="number" min="${esc(min)}" max="${esc(qty)}" value="${esc(min)}"></div><div class="field"><label>Importo unitario proposto €</label><input id="oAmount" type="number" min=".01" step=".01" value="${esc(price)}"></div></div><button class="btn" id="sendOffer" type="button">Invia offerta</button><div class="status" id="offerStatus"></div>`:''}</div>`;
+ openPanel('productPanel');
+ const b=$('sendOffer');if(b)b.addEventListener('click',sendOffer);
+}
+
+async function sendOffer(){
+ try{
+  if(!await user()){openPanel('authPanel');return}
+  const q=Number($('oQty').value),a=Number($('oAmount').value);
+  if(q<=0||a<=0)throw new Error('Quantità e importo devono essere maggiori di zero.');
+  let r=await db.rpc('create_offer',{p_listing_id:selected.id,p_quantity:q,p_amount:a});
+  if(r.error) r=await db.rpc('create_offer',{p_listing_id:selected.id,p_qty:q,p_unit_price:a});
+  $('offerStatus').textContent=r.error?'Errore: '+r.error.message:'Offerta inviata.';
+ }catch(e){$('offerStatus').textContent='Errore: '+errMsg(e)}
+}
+
+async function loadOffers(){
+ try{
+  if(!await user()){openPanel('authPanel');return}
+  openPanel('offersPanel');$('offersList').innerHTML='<div class="empty">Caricamento…</div>';
+  const {data,error}=await db.rpc('offer_inbox',{p_side:'all',p_status:null,p_limit:50,p_offset:0});
+  if(error)throw error;
+  const os=data||[];
+  $('offersList').innerHTML=os.length?os.map(o=>`<div class="box"><b>${esc(o.listing_title||'Offerta')}</b><div class="meta">${esc(o.status||'')} · quantità ${esc(o.quantity??o.qty??'')} · € ${money(o.amount??o.unit_price)}</div>${String(o.status).toLowerCase()==='pending'?`<div class="actions"><button class="btn" data-a="${esc(o.id)}">Accetta</button><button class="btn danger" data-r="${esc(o.id)}">Rifiuta</button><button class="btn alt" data-c="${esc(o.id)}" data-q="${esc(o.quantity??o.qty??1)}" data-m="${esc(o.amount??o.unit_price??0)}">Controfferta</button></div>`:''}</div>`).join(''):'<div class="empty">Nessuna offerta.</div>';
+  document.querySelectorAll('[data-a]').forEach(b=>b.addEventListener('click',async()=>{let r=await db.rpc('accept_offer_atomic',{p_offer_id:b.dataset.a});if(r.error)r=await db.rpc('accept_offer',{p_offer_id:b.dataset.a});if(r.error)alert(r.error.message);await loadOffers();await load()}));
+  document.querySelectorAll('[data-r]').forEach(b=>b.addEventListener('click',async()=>{const r=await db.rpc('reject_offer',{p_offer_id:b.dataset.r});if(r.error)alert(r.error.message);await loadOffers()}));
+  document.querySelectorAll('[data-c]').forEach(b=>b.addEventListener('click',async()=>{const q=prompt('Nuova quantità',b.dataset.q);if(q===null)return;const a=prompt('Nuovo importo unitario',b.dataset.m);if(a===null)return;const r=await db.rpc('counter_offer',{p_offer_id:b.dataset.c,p_quantity:Number(q),p_amount:Number(a)});if(r.error)alert(r.error.message);await loadOffers()}));
+ }catch(e){$('offersList').innerHTML='<div class="empty">Errore: '+esc(errMsg(e))+'</div>'}
+}
+
+async function loadTx(){
+ try{
+  if(!await user()){openPanel('authPanel');return}
+  openPanel('txPanel');$('txList').innerHTML='<div class="empty">Caricamento…</div>';
+  const {data,error}=await db.rpc('my_transactions',{p_limit:50,p_offset:0});if(error)throw error;
+  const ts=data||[];
+  $('txList').innerHTML=ts.length?ts.map(t=>{const amount=Number(t.amount??t.unit_price??0),qty=Number(t.quantity??t.qty??1);return `<div class="box"><b>${esc(t.listing_title||'Transazione')}</b><div class="meta">${esc(t.status||'')} · quantità ${esc(qty)}</div><div class="price">€ ${money(amount*qty)}</div><div class="small">${t.created_at?new Date(t.created_at).toLocaleString('it-IT'):''}</div></div>`}).join(''):'<div class="empty">Nessuna transazione.</div>';
+ }catch(e){$('txList').innerHTML='<div class="empty">Errore: '+esc(errMsg(e))+'</div>'}
+}
+
+db.auth.onAuthStateChange(()=>refreshSession());
+refreshSession();
+load();
+</script>
+</body>
+</html>
